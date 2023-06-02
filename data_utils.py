@@ -9,6 +9,14 @@ import os, re
 import cv2
 import imageio
 
+def change_class(row, cd): 
+    l = row['high_group']
+    if l in cd.keys(): 
+        out = cd[l]
+    else: 
+        out = l 
+    return out
+
 def preprocess_input(image, fixed_size=128):
     '''
     
@@ -72,10 +80,69 @@ def image_generator(dataset, batch_size, lb):
             labels = batch['high_group'].values
             labels = lb.transform(labels)
             image_data = []
+            idx_to_delete = []
             for i in range(len(batch)): 
                 row = batch.iloc[i]
                 input_path = row['full_path']
-                #image_data.append(preprocess_input(cv2.imread(input_path)))
-                image_data.append(preprocess_input(imageio.imread(input_path)))
+                
+                # handling reading errors (some batches will be shorter than batch size!!)
+                
+                try:
+                    image_data.append(preprocess_input(imageio.imread(input_path)))
+                except Exception as e:
+                    idx_to_delete.append(i)
+                    print('Failed file')
+                    print(input_path)
+                    #pass
+                # try putting this line in the loop at the level of the except
+                    labels = np.delete(labels, idx_to_delete, 0)       
+                
             image_data = np.array(image_data)
-            yield (image_data, labels )
+            yield (image_data, labels)
+
+# original:            
+# def image_generator(dataset, batch_size, lb):
+#     '''
+#     '''
+#     data_size = len(dataset)
+#     n_batches = data_size / batch_size
+#     remain = data_size % batch_size 
+#     while True: 
+#         files = dataset.sample(n=data_size - remain)
+#         shuffled = files.sample(frac=1)
+#         result = np.array_split(shuffled, n_batches)  
+#         for batch in result: 
+#             labels = batch['high_group'].values
+#             labels = lb.transform(labels)
+#             image_data = []
+#             for i in range(len(batch)): 
+#                 row = batch.iloc[i]
+#                 input_path = row['full_path']
+#                 #image_data.append(preprocess_input(cv2.imread(input_path)))
+#                 image_data.append(preprocess_input(imageio.imread(input_path)))
+#             image_data = np.array(image_data)
+#             yield (image_data, labels )
+
+# def preprocess_input(image):
+#     fixed_size = 128
+#     image_size = image.shape[:2] 
+#     ratio = float(fixed_size)/max(image_size)
+#     new_size = tuple([int(x*ratio) for x in image_size])
+#     img = cv2.resize(image, (new_size[1], new_size[0]))
+#     delta_w = fixed_size - new_size[1]
+#     delta_h = fixed_size - new_size[0]
+#     top, bottom = delta_h//2, delta_h-(delta_h//2)
+#     left, right = delta_w//2, delta_w-(delta_w//2)
+#     color = [0, 0, 0]
+#     ri = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)
+#     gray_image = cv2.cvtColor(ri, cv2.COLOR_BGR2GRAY)
+#     gimg = np.array(gray_image).reshape(128,128,1)
+#     img_n = cv2.normalize(gimg, gimg, 0, 255, cv2.NORM_MINMAX)
+#     return(img_n)
+
+def is_correct(row):
+    if row['pred_label'] == row['true_label']: 
+        out = 1
+    else: 
+        out = 0
+    return out
