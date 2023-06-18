@@ -33,9 +33,9 @@ def preprocess_input(image, fixed_size=128):
     color = [0, 0, 0]
     ri = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)
     #print(ri.shape)
-    #gray_image = cv2.cvtColor(ri, cv2.COLOR_BGR2GRAY)
-    #gimg = np.array(gray_image).reshape(fixed_size,fixed_size,1)
-    gimg = np.array(ri).reshape(fixed_size,fixed_size,1)
+    gray_image = cv2.cvtColor(ri, cv2.COLOR_BGR2GRAY)
+    gimg = np.array(gray_image).reshape(fixed_size,fixed_size,1)
+    #gimg = np.array(ri).reshape(fixed_size,fixed_size,1)
     img_n = cv2.normalize(gimg, gimg, 0, 255, cv2.NORM_MINMAX)
     return(img_n)
 
@@ -100,6 +100,39 @@ def image_generator(dataset, batch_size, lb):
             image_data = np.array(image_data)
             yield (image_data, labels)
 
+            
+def is_correct(row):
+    if row['pred_label'] == row['true_label']: 
+        out = 1
+    else: 
+        out = 0
+    return out
+
+
+def get_top_5(row):
+    preds = [row[i] for i in range(10)]
+    top_5 = sorted(zip(preds, range(10)), reverse=True)[:5]
+    indices = [n[1] for n in top_5]
+    if row['true_label'] in indices: 
+        out = 1
+    else: 
+        out = 0
+    return out
+
+
+def get_percent(row, c): 
+    val = row[c]
+    return float(val) / float(row['n_obs'])
+
+
+def change_class(row, cd): 
+    l = row['high_group']
+    if l in cd.keys(): 
+        out = cd[l]
+    else: 
+        out = l 
+    return out
+
 # original:            
 # def image_generator(dataset, batch_size, lb):
 #     '''
@@ -139,10 +172,3 @@ def image_generator(dataset, batch_size, lb):
 #     gimg = np.array(gray_image).reshape(128,128,1)
 #     img_n = cv2.normalize(gimg, gimg, 0, 255, cv2.NORM_MINMAX)
 #     return(img_n)
-
-def is_correct(row):
-    if row['pred_label'] == row['true_label']: 
-        out = 1
-    else: 
-        out = 0
-    return out
