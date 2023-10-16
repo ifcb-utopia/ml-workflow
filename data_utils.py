@@ -134,7 +134,6 @@ def change_class(row, cd):
         out = l 
     return out
 
-=======
 
 # original:            
 # def image_generator(dataset, batch_size, lb):
