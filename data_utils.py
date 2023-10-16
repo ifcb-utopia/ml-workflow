@@ -100,6 +100,7 @@ def image_generator(dataset, batch_size, lb):
             image_data = np.array(image_data)
             yield (image_data, labels)
 
+
             
 def is_correct(row):
     if row['pred_label'] == row['true_label']: 
@@ -132,6 +133,8 @@ def change_class(row, cd):
     else: 
         out = l 
     return out
+
+=======
 
 # original:            
 # def image_generator(dataset, batch_size, lb):
@@ -172,3 +175,4 @@ def change_class(row, cd):
 #     gimg = np.array(gray_image).reshape(128,128,1)
 #     img_n = cv2.normalize(gimg, gimg, 0, 255, cv2.NORM_MINMAX)
 #     return(img_n)
+
