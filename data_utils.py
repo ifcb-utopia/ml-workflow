@@ -100,6 +100,42 @@ def image_generator(dataset, batch_size, lb):
             image_data = np.array(image_data)
             yield (image_data, labels)
 
+
+            
+def is_correct(row):
+    if row['pred_label'] == row['true_label']: 
+        out = 1
+    else: 
+        out = 0
+    return out
+
+
+def get_top_5(row):
+    preds = [row[i] for i in range(10)]
+    top_5 = sorted(zip(preds, range(10)), reverse=True)[:5]
+    indices = [n[1] for n in top_5]
+    if row['true_label'] in indices: 
+        out = 1
+    else: 
+        out = 0
+    return out
+
+
+def get_percent(row, c): 
+    val = row[c]
+    return float(val) / float(row['n_obs'])
+
+
+def change_class(row, cd): 
+    l = row['high_group']
+    if l in cd.keys(): 
+        out = cd[l]
+    else: 
+        out = l 
+    return out
+
+=======
+
 # original:            
 # def image_generator(dataset, batch_size, lb):
 #     '''
@@ -140,9 +176,3 @@ def image_generator(dataset, batch_size, lb):
 #     img_n = cv2.normalize(gimg, gimg, 0, 255, cv2.NORM_MINMAX)
 #     return(img_n)
 
-def is_correct(row):
-    if row['pred_label'] == row['true_label']: 
-        out = 1
-    else: 
-        out = 0
-    return out
