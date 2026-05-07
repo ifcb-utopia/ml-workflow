@@ -29,6 +29,12 @@ The latest model checkpoint files are located in the model_ckpt folder. Currentl
 
 The Unidentified_living category represents images that are cells but cannot be identified taxonomically due to morphological ambiguity. The Inoperable category is a catch-all category for anthing non-living (e.g., detritus, microplastic particles) and also anything deemed a non-usable image (e.g., due to bad focus).
 
+Performance metrics for the different groups can be found in the ```check_model_accuracy.pynb``` notebook and are summarized as follows:
+
+<img width="491" height="254" alt="image" src="https://github.com/user-attachments/assets/7cf9a290-dc31-4efc-9b46-0a9467091539" />
+
+
+
 Deployment of the CNN model can be done using the marimo notebook ```create_dataset_csv.py``` found in the [data-pipeline](https://github.com/ifcb-utopia/data-pipeline) repository of ifcbUTOPIA.
 
 Please cite the use of this model as:
